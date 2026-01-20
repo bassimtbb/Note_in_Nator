@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📝 Mes Notes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>📝 Mes Notes</h1>
+            <p class="subtitle">Gestionnaire de notes personnel</p>
+        </header>
+
+        <!-- Formulaire d'ajout/édition -->
+        <section class="note-form">
+            <input type="hidden" id="note-id">
+            <input 
+                type="text" 
+                id="note-title" 
+                placeholder="Titre de la note..."
+                maxlength="255"
+            >
+            <textarea 
+                id="note-content" 
+                placeholder="Contenu de la note..."
+                rows="4"
+            ></textarea>
+            <div class="form-buttons">
+                <button id="btn-save" class="btn btn-primary">
+                    ➕ Ajouter
+                </button>
+                <button id="btn-cancel" class="btn btn-secondary" style="display: none;">
+                    ❌ Annuler
+                </button>
+            </div>
+        </section>
+
+        <!-- Liste des notes -->
+        <section class="notes-list">
+            <h2>📋 Mes notes <span id="notes-count">(0)</span></h2>
+            <div id="notes-container">
+                <p class="loading">Chargement des notes...</p>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>Projet DevOps - Docker & Micro-Services</p>
+            <p class="api-status">
+                API: <span id="api-status">⏳ Vérification...</span>
+            </p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

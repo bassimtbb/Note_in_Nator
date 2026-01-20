@@ -1,0 +1,28 @@
+# ============================================
+# FICHIERS À IGNORER
+# ============================================
+
+# Variables d'environnement (contient les mots de passe)
+.env
+
+# Dépendances Node.js
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Docker volumes locaux (si montés localement)
+data/
+
+# Fichiers temporaires
+*.tmp
+*.temp

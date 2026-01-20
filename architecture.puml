@@ -1,0 +1,61 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam roundcorner 10
+
+title Architecture DevOps - Vikunja (Gestion de Tâches)
+
+cloud "Internet" {
+    actor "Utilisateur" as User
+}
+
+node "Tunnel Cloudflare" as CloudflareNode #Orange {
+    component "cloudflared" as Tunnel
+}
+
+node "Docker Host" as DockerHost {
+    
+    package "Frontend Network" as FrontendNet #LightBlue {
+        component "Caddy\n(Reverse Proxy)" as Caddy #Yellow
+    }
+    
+    package "Backend Network" as BackendNet #LightGreen {
+        component "Vikunja\n(Frontend + API)" as Vikunja #SkyBlue
+        component "Adminer\n(Admin BDD)" as Adminer #Plum
+        database "PostgreSQL\n(Base de données)" as DB #LightYellow
+    }
+    
+    ' Volumes
+    storage "postgres_data" as Vol1 #LightGray
+    storage "vikunja_files" as Vol2 #LightGray
+    storage "caddy_data" as Vol3 #LightGray
+}
+
+' Connexions externes
+User --> Tunnel : HTTPS
+Tunnel --> Caddy : HTTP (port 80)
+
+' Routage Caddy
+Caddy --> Vikunja : "/*"
+Caddy --> Adminer : "/adminer"
+
+' Connexions internes
+Vikunja --> DB : "SQL queries"
+Adminer --> DB : "Admin access"
+
+' Volumes
+DB --> Vol1 : "Persistance BDD"
+Vikunja --> Vol2 : "Fichiers uploadés"
+Caddy --> Vol3 : "Certificats"
+
+' Légende
+legend right
+    | Couleur | Service |
+    |<#Orange>| Tunnel Internet |
+    |<#Yellow>| Reverse Proxy |
+    |<#SkyBlue>| Application Vikunja |
+    |<#Plum>| Administration |
+    |<#LightYellow>| Base de données |
+endlegend
+
+@enduml

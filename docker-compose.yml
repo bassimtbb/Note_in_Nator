@@ -1,0 +1,86 @@
+services:
+  # ============================================
+  # VIKUNJA - Application de gestion de tâches
+  # ============================================
+  vikunja:
+    image: vikunja/vikunja:latest
+    container_name: vikunja-app
+    restart: unless-stopped
+    ports:
+      - "3080:3456"
+    environment:
+      # Configuration base de données
+      VIKUNJA_DATABASE_TYPE: postgres
+      VIKUNJA_DATABASE_HOST: database
+      VIKUNJA_DATABASE_DATABASE: ${POSTGRES_DB:-vikunja}
+      VIKUNJA_DATABASE_USER: ${POSTGRES_USER:-vikunja}
+      VIKUNJA_DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-vikunjapassword}
+      # Configuration service
+      VIKUNJA_SERVICE_JWTSECRET: ${JWT_SECRET:-change-this-secret-in-production}
+      VIKUNJA_SERVICE_PUBLICURL: http://localhost:3080/
+      VIKUNJA_SERVICE_FRONTENDURL: http://localhost:3080/
+      # Désactiver CORS pour éviter les problèmes
+      VIKUNJA_CORS_ENABLE: "false"
+    volumes:
+      - vikunja_files:/app/vikunja/files
+    networks:
+      - backend
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3456/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # BASE DE DONNÉES - PostgreSQL
+  # ============================================
+  database:
+    image: postgres:15-alpine
+    container_name: vikunja-database
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-vikunja}
+      - POSTGRES_USER=${POSTGRES_USER:-vikunja}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-vikunjapassword}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vikunja} -d ${POSTGRES_DB:-vikunja}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================
+  # ADMIN - Interface de gestion BDD
+  # ============================================
+  adminer:
+    image: adminer:latest
+    container_name: vikunja-adminer
+    restart: unless-stopped
+    ports:
+      - "9090:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=database
+    networks:
+      - backend
+
+# ============================================
+# VOLUMES - Persistance des données
+# ============================================
+volumes:
+  postgres_data:
+    name: vikunja_postgres_data
+  vikunja_files:
+    name: vikunja_files
+
+# ============================================
+# NETWORKS - Isolation des services
+# ============================================
+networks:
+  backend:
+    name: vikunja_backend

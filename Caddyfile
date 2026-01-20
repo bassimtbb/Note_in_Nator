@@ -1,0 +1,17 @@
+:80 {
+    # Route principale -> Vikunja
+    handle /* {
+        reverse_proxy vikunja:3456
+    }
+
+    # Route Admin -> Adminer (interface BDD)
+    handle /adminer* {
+        reverse_proxy adminer:8080
+    }
+
+    # Logs
+    log {
+        output stdout
+        format console
+    }
+}
