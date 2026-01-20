@@ -1,4 +1,4 @@
-# Note_in_Nator 
+# Note_in_Nator (ex: My Super DevOps Stack)
 
 > **⚠️ MEMBRES DU GROUPE :**
 > - **CHAWOUKI DINA** (Rôle éventuel, ex: Dev)
@@ -8,12 +8,15 @@
 ---
 
 ## 1. Présentation du Projet
-*Décrivez ici en quelques lignes le but de votre application.*
+*Ce projet vise à déployer une instance auto-hébergée de Vikunja, une plateforme de gestion de tâches open-source. L'objectif est de fournir une solution collaborative, performante et privée pour gérer des projets, remplaçant des outils comme Trello ou Todoist. L'architecture sépare le frontend (interface utilisateur) du backend (API) pour une meilleure scalabilité..*
 *Exemple : Ce projet est une stack permettant de gérer une liste de tâches (TodoList) avec une interface web et une base de données, le tout monitoré via Portainer.*
 
 **Fonctionnalités principales :**
-* Fonctionnalité 1
-* Fonctionnalité 2
+* Vues multiples : Gestion des tâches sous forme de Listes, Tableaux Kanban, Diagrammes de Gantt et Calendriers.
+
+* Collaboration : Partage de listes, assignation de tâches et gestion des droits utilisateurs.
+
+* Intégration : Synchronisation CalDAV pour les agendas externes.
 
 **Lien accessible (si tunnel actif) :** [https://votre-url-random.trycloudflare.com](https://votre-url-random.trycloudflare.com)
 
@@ -38,6 +41,7 @@
 | **App** | `wordpress` | CMS | 80 |
 | **DB** | `mysql:5.7` | Base de données | 3306 |
 | **Tunnel** | `cloudflared` | Exposition Internet | N/A |
+
 
 ## 3. Guide d'installation
 
