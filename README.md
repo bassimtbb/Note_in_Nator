@@ -1,7 +1,7 @@
 # Note_in_Nator
 
 > **⚠️ MEMBRES DU GROUPE :**
-> - **CHAOUKI DINA**
+> - **CHAOUKI Dina**
 > - **TABBEB Bassim**
 > - **PENAGOS Mathis**
 
@@ -73,15 +73,17 @@ Pour lancer le projet localement :
 *Expliquez rapidement comment vous avez travaillé (Pair programming, répartition des tâches...)*
 
 ### Utilisation de l'IA (Copilot, ChatGPT, Cursor...)
-*Soyez honnêtes, c'est valorisé !*
 
-* **Outils utilisés :** (Ex: ChatGPT 4, GitHub Copilot)
+* **Outils utilisés :** ChatGPT 4, GitHub Gemini
 * **Usage :**
-    * *Génération de code :* (Ex: "Nous avons utilisé Copilot pour générer le boilerplate du Docker Compose")
+    * *Génération de code :* ("Pour crée le fichier yaml")
     * *Débuggage :* (Ex: "ChatGPT nous a aidé à comprendre l'erreur 502 Bad Gateway")
-    * *Documentation :* (Ex: "Nous avons reformulé l'intro avec l'IA")
+    * *Documentation :* (Ex: "Nous avons reformulé la présentation de projet avec Gemini")
 * **Apprentissage :** (Ce que l'IA a fait vs ce que vous avez compris).
 
 ## 5. Difficultés rencontrées & Solutions
-* *Problème 1 :* La base de données ne gardait pas les données.
-* *Solution :* Ajout d'un volume nommé dans le docker-compose.
+* Problème 1 : Erreur CORS et Communications Inter-conteneurs.
+
+Symptôme : Le navigateur bloquait les requêtes entre le frontend et l'API car ils tournaient sur des ports/services différents.
+
+* *Solution avec Caddy :* Utilisation d'un Caddyfile pour centraliser les requêtes. Caddy agit comme point d'entrée unique. Il redirige les requêtes vers le frontend par défaut, et vers l'API si l'URL commence par /api ou /dav. Cela élimine les problèmes de CORS puisque pour le navigateur, tout provient du même domaine.
