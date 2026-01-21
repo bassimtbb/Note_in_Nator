@@ -37,10 +37,11 @@
 ### Description des services
 | Service | Image Docker | Rôle | Port Interne |
 | :--- | :--- | :--- | :--- |
-| **Proxy** | `caddy:latest` | Reverse Proxy & Routing | 80 |
-| **App** | `wordpress` | CMS | 80 |
-| **DB** | `mysql:5.7` | Base de données | 3306 |
-| **Tunnel** | `cloudflared` | Exposition Internet | N/A |
+| **Caddy** | `caddy:latest` | Reverse Proxy & Routing | 8000:80, 8443:443 |
+| **Vikunja** | `vikunja/vikunja:latest` | Gestion de tâches | 3456 |
+| **PostgreSQL** | `postgres:15-alpine` | Base de données | 5432 |
+| **Adminer** | `adminer:latest` | Interface admin BDD | 8080 |
+| **Cloudflared** | `cloudflare/cloudflared:latest` | Tunnel Cloudflare HTTPS | N/A |
 
 
 ## 3. Guide d'installation
@@ -49,23 +50,92 @@ Pour lancer le projet localement :
 
 1.  Cloner le dépôt :
     ```bash
-    git clone [https://github.com/votre-user/votre-repo.git](https://github.com/votre-user/votre-repo.git)
-    cd votre-repo
+    git clone https://github.com/bassimtbb/Note_in_Nator.git
+    cd Projet
     ```
 
-2.  Lancer la stack :
+2.  Créer le fichier `.env` :
+    ```bash
+    cp .env.example .env
+    ```
+
+3.  Lancer la stack :
     ```bash
     docker compose up -d
     ```
 
-3.  Accéder aux services :
-    * Web : `http://localhost`
-    * Admin : `http://localhost/adminer` (exemple)
-
-4.  Obtenir l'URL publique :
+4.  Attendre que les services démarrent (30-45 secondes) :
     ```bash
-    docker compose logs -f tunnel
+    docker compose ps
     ```
+
+5.  Accéder aux services :
+    * **Vikunja** : http://localhost:8000/vikunja/
+    * **Adminer** : http://localhost:8000/admin/
+    * **Identifiants Adminer** :
+      - Serveur: `database`
+      - Utilisateur: `vikunja`
+      - Mot de passe: `vikunja123`
+      - Base: `vikunja`
+
+## Vérification du déploiement
+
+### Vérifier que tous les services tournent
+```bash
+docker compose ps
+```
+
+**Résultat attendu :** 5 conteneurs avec status "Up"
+- caddy-proxy (8000:80, 8443:443)
+- vikunja-app (3456)
+- vikunja-database (5432)
+- vikunja-adminer (8080)
+- cloudflared-tunnel
+
+### Vérifier les logs
+```bash
+# Logs Vikunja
+docker compose logs vikunja -n 20
+
+# Logs Caddy (routing)
+docker compose logs caddy -n 20
+
+# Logs Cloudflared (configuration info)
+docker compose logs cloudflared -n 30
+```
+
+### Tester la connectivité
+```bash
+# Tester Vikunja via Caddy
+curl http://localhost:8000/vikunja/
+
+# Tester l'API
+curl http://localhost:8000/api/v1/info
+
+# Tester Adminer
+curl http://localhost:8000/admin/
+```
+
+### Vérifier Cloudflare Tunnel
+Pour vérifier que Cloudflare fonctionne :
+
+1. **Le conteneur cloudflared doit rester actif** (sans crash)
+   ```bash
+   docker compose ps | grep cloudflared
+   ```
+   → Status doit être "Up"
+
+2. **Les logs doivent afficher les instructions** (pas d'erreurs)
+   ```bash
+   docker compose logs cloudflared
+   ```
+   → Affiche le message d'aide (pas de "error" ou "ERR")
+
+3. **Pour activer le vrai tunnel Cloudflare** :
+   - Créer un tunnel: https://dash.cloudflare.com/
+   - Récupérer les credentials
+   - Placer dans `cloudflared_data/`
+   - Redémarrer: `docker compose restart cloudflared`
 
 ## 4. Méthodologie & Transparence IA
 

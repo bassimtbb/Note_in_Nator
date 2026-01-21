@@ -1,0 +1,31 @@
+# Caddy Reverse Proxy Configuration
+# Point d'entrée unique pour toute l'infrastructure
+
+:80 {
+	# Route vers Vikunja (Gestion de tâches)
+	@vikunja path /vikunja /vikunja/* /api* /assets* /sw.js /manifest.webmanifest /favicon.ico /images* /workbox*
+	handle @vikunja {
+		# Ne retirer le préfixe /vikunja que si présent
+		@vpath path /vikunja /vikunja/*
+		handle @vpath {
+			uri strip_prefix /vikunja
+		}
+		# Reverse proxy to Vikunja
+		reverse_proxy vikunja:3456
+	}
+
+	# Route vers Adminer (Gestion BDD) - /admin
+	@admin path /admin*
+	handle @admin {
+		uri strip_prefix /admin
+		reverse_proxy adminer:8080
+	}
+
+	# Logs
+	log {
+		output stdout
+		format json
+	}
+}
+
+

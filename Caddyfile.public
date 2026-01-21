@@ -1,0 +1,37 @@
+:443 {
+	encode gzip
+
+	@vikunja path /vikunja /vikunja/* /api* /assets* /sw.js /manifest.webmanifest /favicon.ico /images* /workbox*
+	handle @vikunja {
+		@vpath path /vikunja /vikunja/*
+		handle @vpath {
+			uri strip_prefix /vikunja
+		}
+		reverse_proxy vikunja:3456 {
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-Host {http.request.host}
+		}
+	}
+
+	@admin path /admin*
+	handle @admin {
+		uri strip_prefix /admin
+		reverse_proxy adminer:8080 {
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-Host {http.request.host}
+		}
+	}
+
+	handle /health {
+		respond "OK" 200
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}
+
+:80 {
+	redir https://{http.request.host}{http.request.uri} permanent
+}

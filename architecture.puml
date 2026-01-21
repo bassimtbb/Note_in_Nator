@@ -36,8 +36,9 @@ User --> Tunnel : HTTPS
 Tunnel --> Caddy : HTTP (port 80)
 
 ' Routage Caddy
-Caddy --> Vikunja : "/*"
-Caddy --> Adminer : "/adminer"
+Caddy --> Vikunja : "/vikunja/*"
+Caddy --> Vikunja : "/api/*"
+Caddy --> Adminer : "/admin/*"
 
 ' Connexions internes
 Vikunja --> DB : "SQL queries"
