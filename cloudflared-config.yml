@@ -1,0 +1,11 @@
+tunnel: vikunja-tunnel
+credentials-file: /home/nonroot/.cloudflared/credentials.json
+
+ingress:
+  - hostname: vikunja.local
+    service: http://caddy:80
+  - service: http_status:404
+
+# Pour tester localement sans tunnel Cloudflare complet:
+# Cette config peut être lancée avec un token générés depuis le dashboard Cloudflare
+

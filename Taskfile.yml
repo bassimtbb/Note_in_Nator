@@ -1,0 +1,74 @@
+version: '3'
+
+tasks:
+  up:
+    desc: "Démarrer les services"
+    cmds:
+      - docker compose up -d
+      - echo "Services démarrés! Accès via http://localhost:8000/vikunja/"
+
+  down:
+    desc: "Arrêter les services"
+    cmds:
+      - docker compose down
+
+  logs:
+    desc: "Voir les logs"
+    cmds:
+      - docker compose logs -f
+
+  logs-caddy:
+    desc: "Logs du reverse proxy Caddy"
+    cmds:
+      - docker compose logs caddy -f
+
+  logs-vikunja:
+    desc: "Logs de Vikunja"
+    cmds:
+      - docker compose logs vikunja -f
+
+  logs-cloudflare:
+    desc: "Logs de Cloudflare Tunnel"
+    cmds:
+      - docker compose logs cloudflared -f
+
+  ps:
+    desc: "État des services"
+    cmds:
+      - docker compose ps
+
+  restart:
+    desc: "Redémarrer les services"
+    cmds:
+      - docker compose restart
+
+  clean:
+    desc: "Nettoyer (volumes, images)"
+    cmds:
+      - docker compose down -v
+      - echo "Services et volumes supprimés"
+
+  test-vikunja:
+    desc: "Tester Vikunja"
+    cmds:
+      - echo "Testing Vikunja..."
+      - docker exec vikunja-app wget -q -O- http://localhost:3456/health || echo "Vikunja health check"
+
+  test-db:
+    desc: "Tester la BDD"
+    cmds:
+      - echo "Testing PostgreSQL..."
+      - docker exec vikunja-database pg_isready -U vikunja -d vikunja
+
+  test-all:
+    desc: "Tester tous les services"
+    cmds:
+      - task: ps
+      - task: test-db
+      - task: test-vikunja
+      - echo "✅ Tous les tests terminés!"
+
+  help:
+    desc: "Afficher l'aide"
+    cmds:
+      - task -l

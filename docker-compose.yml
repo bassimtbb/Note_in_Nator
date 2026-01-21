@@ -1,25 +1,39 @@
 services:
-  # ============================================
-  # VIKUNJA - Application de gestion de tâches
-  # ============================================
+  caddy:
+    image: caddy:latest
+    container_name: caddy-proxy
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+      - "8443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - backend
+    depends_on:
+      - vikunja
+      - adminer
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   vikunja:
     image: vikunja/vikunja:latest
     container_name: vikunja-app
     restart: unless-stopped
-    ports:
-      - "3080:3456"
     environment:
-      # Configuration base de données
       VIKUNJA_DATABASE_TYPE: postgres
       VIKUNJA_DATABASE_HOST: database
       VIKUNJA_DATABASE_DATABASE: ${POSTGRES_DB:-vikunja}
       VIKUNJA_DATABASE_USER: ${POSTGRES_USER:-vikunja}
       VIKUNJA_DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-vikunjapassword}
-      # Configuration service
       VIKUNJA_SERVICE_JWTSECRET: ${JWT_SECRET:-change-this-secret-in-production}
-      VIKUNJA_SERVICE_PUBLICURL: http://localhost:3080/
-      VIKUNJA_SERVICE_FRONTENDURL: http://localhost:3080/
-      # Désactiver CORS pour éviter les problèmes
+      VIKUNJA_SERVICE_PUBLICURL: http://localhost:8000/vikunja/
+      VIKUNJA_SERVICE_FRONTENDURL: http://localhost:8000/vikunja/
       VIKUNJA_CORS_ENABLE: "false"
     volumes:
       - vikunja_files:/app/vikunja/files
@@ -34,9 +48,6 @@ services:
       timeout: 10s
       retries: 3
 
-  # ============================================
-  # BASE DE DONNÉES - PostgreSQL
-  # ============================================
   database:
     image: postgres:15-alpine
     container_name: vikunja-database
@@ -55,32 +66,39 @@ services:
       timeout: 5s
       retries: 5
 
-  # ============================================
-  # ADMIN - Interface de gestion BDD
-  # ============================================
   adminer:
     image: adminer:latest
     container_name: vikunja-adminer
     restart: unless-stopped
-    ports:
-      - "9090:8080"
     environment:
       - ADMINER_DEFAULT_SERVER=database
     networks:
       - backend
 
-# ============================================
-# VOLUMES - Persistance des données
-# ============================================
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared-tunnel
+    restart: unless-stopped
+    volumes:
+      - cloudflared_data:/root/.cloudflared
+    networks:
+      - backend
+    depends_on:
+      - caddy
+    command: tunnel --url http://caddy:80
+
 volumes:
   postgres_data:
     name: vikunja_postgres_data
   vikunja_files:
     name: vikunja_files
+  caddy_data:
+    name: caddy_data
+  caddy_config:
+    name: caddy_config
+  cloudflared_data:
+    name: cloudflared_data
 
-# ============================================
-# NETWORKS - Isolation des services
-# ============================================
 networks:
   backend:
     name: vikunja_backend

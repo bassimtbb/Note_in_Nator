@@ -1,0 +1,23 @@
+:80 {
+	@vikunja path /vikunja /vikunja/* /api* /assets* /sw.js /manifest.webmanifest /favicon.ico /images* /workbox*
+	handle @vikunja {
+		@vpath path /vikunja /vikunja/*
+		handle @vpath {
+			uri strip_prefix /vikunja
+		}
+		reverse_proxy vikunja:3456
+	}
+
+	@admin path /admin*
+	handle @admin {
+		uri strip_prefix /admin
+		reverse_proxy adminer:8080
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}
+
+
