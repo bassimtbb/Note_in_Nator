@@ -43,10 +43,7 @@ services:
       database:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:3456/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      disable: true
 
   database:
     image: postgres:15-alpine
@@ -86,6 +83,22 @@ services:
     depends_on:
       - caddy
     command: tunnel --url http://caddy:80
+
+  dockge:
+    image: louislam/dockge:1
+    container_name: dockge
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/dockge:/app/data
+      - ../:/app/stacks
+    environment:
+      - DOCKGE_STACKS_DIR=/app/stacks
+      - DOCKGE_BASE_URL=/dockge
+    networks:
+      - backend
 
 volumes:
   postgres_data:
