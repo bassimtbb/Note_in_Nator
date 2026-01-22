@@ -26,3 +26,6 @@ data/
 # Fichiers temporaires
 *.tmp
 *.temp
+
+# Kubernetes Secrets
+k8s/01-secrets.yaml

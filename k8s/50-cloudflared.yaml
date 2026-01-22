@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflared
+  template:
+    metadata:
+      labels:
+        app: cloudflared
+    spec:
+      containers:
+        - name: cloudflared
+          image: cloudflare/cloudflared:latest
+          args:
+            - tunnel
+            - --url
+            - http://caddy:80
+          env:
+            - name: TUNNEL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: vikunja-secrets
+                  key: TUNNEL_TOKEN
+          volumeMounts:
+            - name: cloudflared-data
+              mountPath: /root/.cloudflared
+      volumes:
+        - name: cloudflared-data
+          persistentVolumeClaim:
+            claimName: cloudflared-data-pvc
