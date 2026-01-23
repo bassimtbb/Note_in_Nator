@@ -11,11 +11,18 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - test-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vikunja}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   vikunja:
     build: .
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     environment:
       VIKUNJA_DATABASE_TYPE: postgres
       VIKUNJA_DATABASE_HOST: database
@@ -27,8 +34,12 @@ services:
       VIKUNJA_SERVICE_JWTSECRET: ${JWT_SECRET:-test-secret-key-for-testing-only}
       VIKUNJA_SERVICE_PUBLICURL: http://localhost:3456
       VIKUNJA_CORS_ENABLE: "true"
+      GOMODCACHE: /tmp/.cache
+      HOME: /tmp
     ports:
       - "3456:3456"
+    volumes:
+      - /tmp/.cache:/tmp/.cache
     networks:
       - test-network
     healthcheck:
