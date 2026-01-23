@@ -1,20 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: vikunja
+  name: vikunja-v1
+  labels:
+    app: vikunja
+    version: v1
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: vikunja
+      version: v1
   template:
     metadata:
       labels:
         app: vikunja
+        version: v1
     spec:
       containers:
         - name: vikunja
-          image: vikunja/vikunja:latest
+          image: vikunja/vikunja:1.0.0-rc3
           ports:
             - containerPort: 3456 
           env:
@@ -55,14 +60,3 @@ spec:
         - name: files
           persistentVolumeClaim:
             claimName: vikunja-files-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: vikunja
-spec:
-  ports:
-    - port: 3456
-      targetPort: 3456
-  selector:
-    app: vikunja

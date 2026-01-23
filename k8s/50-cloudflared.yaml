@@ -19,12 +19,6 @@ spec:
             - tunnel
             - --url
             - http://caddy:80
-          env:
-            - name: TUNNEL_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: vikunja-secrets
-                  key: TUNNEL_TOKEN
           volumeMounts:
             - name: cloudflared-data
               mountPath: /root/.cloudflared
