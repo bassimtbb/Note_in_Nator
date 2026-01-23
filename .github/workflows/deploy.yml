@@ -6,11 +6,6 @@ on:
       - main
       - develop
       - master
-    paths:
-      - 'k8s/**'
-      - '.github/workflows/**'
-      - 'docker-compose.yml'
-      - 'build/**'
 
 jobs:
   test:
