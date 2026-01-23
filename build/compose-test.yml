@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vikunja}
+      POSTGRES_USER: ${POSTGRES_USER:-vikunja}
+      POSTGRES_DB: ${POSTGRES_DB:-vikunja}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - test-network
+
+  vikunja:
+    build: .
+    depends_on:
+      - database
+    environment:
+      VIKUNJA_DATABASE_HOST: database
+      VIKUNJA_DATABASE_USER: ${POSTGRES_USER:-vikunja}
+      VIKUNJA_DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-vikunja}
+      VIKUNJA_DATABASE_DATABASE: ${POSTGRES_DB:-vikunja}
+      VIKUNJA_SERVICE_JWTSECRET: ${JWT_SECRET:-test-secret-key-for-testing-only}
+    ports:
+      - "3456:3456"
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3456/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  test:
+    build: .
+    depends_on:
+      vikunja:
+        condition: service_healthy
+    command: python -m pytest test_vikunja.py -v || python test_vikunja.py
+    environment:
+      PYTHONUNBUFFERED: 1
+    volumes:
+      - .:/app
+    networks:
+      - test-network
+
+volumes:
+  postgres_data:
+
+networks:
+  test-network:
+    driver: bridge
