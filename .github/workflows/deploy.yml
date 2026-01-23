@@ -14,7 +14,7 @@ on:
 
 jobs:
   test:
-    name:  Run Tests
+    name: 🧪 Run Tests
     runs-on: ubuntu-latest
     
     steps:
@@ -28,14 +28,14 @@ jobs:
         run: |
           cd build
           docker-compose -f compose-test.yml up --build --abort-on-container-exit
-          echo " All tests passed!"
+          echo "✅ All tests passed!"
 
       - name: Cleanup test containers
         if: always()
         run: cd build && docker-compose -f compose-test.yml down -v
 
   build-and-deploy:
-    name:  Deploy to Kubernetes
+    name: 🚀 Deploy to Kubernetes
     runs-on: ubuntu-latest
     needs: test
     
@@ -56,9 +56,9 @@ jobs:
 
       - name: Validate K8s manifests
         run: |
-          echo " Validating Kubernetes manifests..."
+          echo "🔍 Validating Kubernetes manifests..."
           kubectl apply -f k8s/ --dry-run=client -o yaml > /dev/null
-          echo " All manifests are valid!"
+          echo "✅ All manifests are valid!"
 
       - name: Apply K8s manifests
         run: |
@@ -84,20 +84,20 @@ jobs:
 
       - name: Post-deployment health check
         run: |
-          echo " Running health checks..."
+          echo "🏥 Running health checks..."
           sleep 10
           kubectl get pods -n default
-          echo " Deployment complete!"
+          echo "✅ Deployment complete!"
 
       - name: Summary
         run: |
+          echo "╔════════════════════════════════════╗"
+          echo "║   🎉 CI/CD Pipeline Complete   🎉   ║"
+          echo "╚════════════════════════════════════╝"
           echo ""
-          echo "    CI/CD Pipeline Complete      "
-          echo ""
-          echo ""
-          echo " Tests passed"
-          echo " Manifests validated"
-          echo " Canary deployment successful"
+          echo "✅ Tests passed"
+          echo "✅ Manifests validated"
+          echo "✅ Canary deployment successful"
           echo ""
           echo "Commit: ${{ github.sha }}"
           echo "Branch: ${{ github.ref }}"
