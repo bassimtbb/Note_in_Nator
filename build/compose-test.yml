@@ -17,10 +17,13 @@ services:
     depends_on:
       - database
     environment:
+      VIKUNJA_DATABASE_TYPE: postgres
       VIKUNJA_DATABASE_HOST: database
+      VIKUNJA_DATABASE_PORT: 5432
       VIKUNJA_DATABASE_USER: ${POSTGRES_USER:-vikunja}
       VIKUNJA_DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-vikunja}
       VIKUNJA_DATABASE_DATABASE: ${POSTGRES_DB:-vikunja}
+      VIKUNJA_DATABASE_SSLMODE: disable
       VIKUNJA_SERVICE_JWTSECRET: ${JWT_SECRET:-test-secret-key-for-testing-only}
       VIKUNJA_SERVICE_PUBLICURL: http://localhost:3456
       VIKUNJA_CORS_ENABLE: "true"
