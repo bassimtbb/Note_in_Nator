@@ -19,6 +19,8 @@ jobs:
       - name: Run tests with Docker Compose
         run: |
           cd build
+          # Copy .env.test to .env for docker compose
+          cp .env.test .env
           docker compose -f compose-test.yml up --build --abort-on-container-exit
           echo "✅ All tests passed!"
 
