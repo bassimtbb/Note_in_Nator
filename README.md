@@ -19,9 +19,11 @@
 
 * Intégration : Synchronisation CalDAV pour les agendas externes.
 
-**Lien accessible (si tunnel actif) :** [https://votre-url-random.trycloudflare.com](https://votre-url-random.trycloudflare.com)
+**Lien accessible (Cloudflare Tunnel actif) :** [https://ordering-experiencing-growing-glasses.trycloudflare.com](https://ordering-experiencing-growing-glasses.trycloudflare.com)
 
-**Screenshot de l'application déployée** : ![](screenshot.jpg)
+**Screenshot de l'application déployée** :
+
+![Vikunja Login Page via Cloudflare Tunnel](screenshot.jpg)
 
 ## 2. Architecture Technique
 
